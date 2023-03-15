@@ -30,6 +30,7 @@ namespace NotesApp
         private void InitializeComponent()
         {
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(NotesApp));
             this.dataGridNotes = new System.Windows.Forms.DataGridView();
             this.titleTextBox = new System.Windows.Forms.TextBox();
             this.noteTextBox = new System.Windows.Forms.TextBox();
@@ -55,17 +56,20 @@ namespace NotesApp
             this.dataGridNotes.AllowUserToOrderColumns = true;
             this.dataGridNotes.AllowUserToResizeColumns = false;
             this.dataGridNotes.AllowUserToResizeRows = false;
+            this.dataGridNotes.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.dataGridNotes.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.dataGridNotes.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridNotes.ColumnHeadersVisible = false;
             dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             dataGridViewCellStyle1.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.Gainsboro;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.Color.Silver;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.Color.Black;
             dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
             this.dataGridNotes.DefaultCellStyle = dataGridViewCellStyle1;
+            this.dataGridNotes.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.dataGridNotes.Location = new System.Drawing.Point(556, 32);
             this.dataGridNotes.Name = "dataGridNotes";
             this.dataGridNotes.ReadOnly = true;
@@ -73,12 +77,14 @@ namespace NotesApp
             this.dataGridNotes.RowTemplate.Height = 25;
             this.dataGridNotes.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.dataGridNotes.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridNotes.Size = new System.Drawing.Size(457, 439);
+            this.dataGridNotes.Size = new System.Drawing.Size(457, 411);
             this.dataGridNotes.TabIndex = 0;
             this.dataGridNotes.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.cell_DoubleClick);
             // 
             // titleTextBox
             // 
+            this.titleTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.titleTextBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.titleTextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.titleTextBox.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
@@ -90,6 +96,9 @@ namespace NotesApp
             // 
             // noteTextBox
             // 
+            this.noteTextBox.AcceptsTab = true;
+            this.noteTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.noteTextBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.noteTextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.noteTextBox.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
@@ -98,7 +107,7 @@ namespace NotesApp
             this.noteTextBox.Multiline = true;
             this.noteTextBox.Name = "noteTextBox";
             this.noteTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.noteTextBox.Size = new System.Drawing.Size(529, 381);
+            this.noteTextBox.Size = new System.Drawing.Size(529, 353);
             this.noteTextBox.TabIndex = 2;
             // 
             // button1
@@ -131,11 +140,12 @@ namespace NotesApp
             // 
             // button3
             // 
+            this.button3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.button3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(86)))), ((int)(((byte)(65)))), ((int)(((byte)(56)))));
             this.button3.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.button3.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.button3.ForeColor = System.Drawing.Color.Gainsboro;
-            this.button3.Location = new System.Drawing.Point(385, 448);
+            this.button3.Location = new System.Drawing.Point(385, 420);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(75, 23);
             this.button3.TabIndex = 5;
@@ -145,11 +155,12 @@ namespace NotesApp
             // 
             // button4
             // 
+            this.button4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.button4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(86)))), ((int)(((byte)(65)))), ((int)(((byte)(56)))));
             this.button4.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.button4.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.button4.ForeColor = System.Drawing.Color.Gainsboro;
-            this.button4.Location = new System.Drawing.Point(466, 448);
+            this.button4.Location = new System.Drawing.Point(466, 420);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(75, 23);
             this.button4.TabIndex = 6;
@@ -159,8 +170,7 @@ namespace NotesApp
             // 
             // titleBar
             // 
-            this.titleBar.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.titleBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.titleBar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(46)))), ((int)(((byte)(38)))), ((int)(((byte)(35)))));
             this.titleBar.Controls.Add(this.resizeButton);
@@ -169,7 +179,7 @@ namespace NotesApp
             this.titleBar.Controls.Add(this.buttonExit);
             this.titleBar.Location = new System.Drawing.Point(-3, -5);
             this.titleBar.Name = "titleBar";
-            this.titleBar.Size = new System.Drawing.Size(1346, 31);
+            this.titleBar.Size = new System.Drawing.Size(1344, 31);
             this.titleBar.TabIndex = 7;
             // 
             // resizeButton
@@ -182,7 +192,7 @@ namespace NotesApp
             this.resizeButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.resizeButton.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.resizeButton.ForeColor = System.Drawing.Color.Gainsboro;
-            this.resizeButton.Location = new System.Drawing.Point(1231, 2);
+            this.resizeButton.Location = new System.Drawing.Point(1225, 2);
             this.resizeButton.Name = "resizeButton";
             this.resizeButton.Size = new System.Drawing.Size(57, 29);
             this.resizeButton.TabIndex = 3;
@@ -214,7 +224,7 @@ namespace NotesApp
             this.buttonMinimize.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonMinimize.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.buttonMinimize.ForeColor = System.Drawing.Color.Gainsboro;
-            this.buttonMinimize.Location = new System.Drawing.Point(1172, 2);
+            this.buttonMinimize.Location = new System.Drawing.Point(1166, 2);
             this.buttonMinimize.Name = "buttonMinimize";
             this.buttonMinimize.Size = new System.Drawing.Size(57, 29);
             this.buttonMinimize.TabIndex = 1;
@@ -233,7 +243,7 @@ namespace NotesApp
             this.buttonExit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonExit.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.buttonExit.ForeColor = System.Drawing.Color.Gainsboro;
-            this.buttonExit.Location = new System.Drawing.Point(1289, 2);
+            this.buttonExit.Location = new System.Drawing.Point(1283, 2);
             this.buttonExit.Name = "buttonExit";
             this.buttonExit.Size = new System.Drawing.Size(57, 29);
             this.buttonExit.TabIndex = 0;
@@ -244,10 +254,11 @@ namespace NotesApp
             // 
             // statusLabel
             // 
+            this.statusLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.statusLabel.AutoSize = true;
             this.statusLabel.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.statusLabel.ForeColor = System.Drawing.Color.Gainsboro;
-            this.statusLabel.Location = new System.Drawing.Point(13, 455);
+            this.statusLabel.Location = new System.Drawing.Point(13, 427);
             this.statusLabel.Name = "statusLabel";
             this.statusLabel.Size = new System.Drawing.Size(56, 14);
             this.statusLabel.TabIndex = 8;
@@ -255,11 +266,13 @@ namespace NotesApp
             // 
             // settingsGroup
             // 
+            this.settingsGroup.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.settingsGroup.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.settingsGroup.ForeColor = System.Drawing.Color.Gainsboro;
             this.settingsGroup.Location = new System.Drawing.Point(1019, 32);
             this.settingsGroup.Name = "settingsGroup";
-            this.settingsGroup.Size = new System.Drawing.Size(313, 439);
+            this.settingsGroup.Size = new System.Drawing.Size(313, 411);
             this.settingsGroup.TabIndex = 9;
             this.settingsGroup.TabStop = false;
             this.settingsGroup.Text = "Settings";
@@ -269,7 +282,7 @@ namespace NotesApp
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(32)))), ((int)(((byte)(31)))), ((int)(((byte)(28)))));
-            this.ClientSize = new System.Drawing.Size(1343, 481);
+            this.ClientSize = new System.Drawing.Size(1341, 453);
             this.Controls.Add(this.settingsGroup);
             this.Controls.Add(this.statusLabel);
             this.Controls.Add(this.titleBar);
@@ -281,6 +294,7 @@ namespace NotesApp
             this.Controls.Add(this.titleTextBox);
             this.Controls.Add(this.dataGridNotes);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "NotesApp";
             this.Text = "Notes";
             this.Load += new System.EventHandler(this.LoadApp);
