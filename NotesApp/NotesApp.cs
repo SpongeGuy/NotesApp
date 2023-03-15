@@ -49,12 +49,11 @@ namespace NotesApp
         public Size windowSizeNormal = new Size(1027, 481);
         public Size windowSizeSettings = new Size(1344, 481);
 
-        //public Color formBackground = new Color(Color.FromArgb);
-
-
-
-
-
+        public Color backgroundColor = Color.FromArgb(32, 31, 28);
+        public Color buttonColor = Color.FromArgb(86, 65, 56);
+        public Color textBoxColor = Color.FromArgb(64, 64, 64);
+        public Color panelColor = Color.FromArgb(46, 38, 35);
+        public Color textColor = Color.Gainsboro;
 
         // END SETTINGS
 
@@ -66,6 +65,8 @@ namespace NotesApp
             InitializeComponent();
             windowSizeStatus = WindowSizeStatuses.Normal;
             this.Size = windowSizeNormal;
+
+
 
             // this controls the resize button's behaviors when holding control (accessing options menu)
             hoveringResizeButtonTimer = new System.Windows.Forms.Timer();
@@ -138,6 +139,7 @@ namespace NotesApp
             }
         }
 
+        // this is for the fucking BULLSHIT SERIALIZATION LOADING PACKET FUCKINGSHIT
         public RawRowsPacket GetRawRows()
         {
             List<string> titles = new List<string>();
@@ -157,6 +159,12 @@ namespace NotesApp
             return packet;
         }
 
+        private void safelyCloseApp()
+        {
+            Serializer.SaveData(this);
+            this.Close();
+        }
+
         private DialogResult CreateDialogPrompt(params string[] messages)
         {
             DialogPrompt prompt = new DialogPrompt();
@@ -171,12 +179,6 @@ namespace NotesApp
                 dataGridNotes.ClearSelection();
                 dataGridNotes.CurrentCell = null;
             }
-        }
-
-        private void safelyCloseApp()
-        {
-            Serializer.SaveData(this);
-            this.Close();
         }
 
         // --------------------BUTTONS BEHAVIORS--------------------
