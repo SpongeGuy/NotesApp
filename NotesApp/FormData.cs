@@ -15,8 +15,13 @@ namespace NotesApp
         public DataTable table;
         public List<string> titles;
         public List<string> notes;
-        public List<DateTime> dates;
+        public List<DateTime> originalDates;
+        public List<DateTime> modifiedDates;
+        public List<string> folders;
         public RawRowsPacket packet;
+
+        public int windowHeight;
+        public NotesApp.WindowSizeStatuses windowSizeStatus;
 
         public FormData(NotesApp app)
         {
@@ -24,7 +29,13 @@ namespace NotesApp
             packet = app.GetRawRows();
             titles = packet.titles;
             notes = packet.notes;
-            dates = packet.dates;
+            originalDates = packet.originalDates;
+            modifiedDates = packet.modifiedDates;
+            folders = packet.folders;
+
+            windowHeight = app.windowHeight;
+            windowSizeStatus = app.windowSizeStatus;
+            
             
         }
     }

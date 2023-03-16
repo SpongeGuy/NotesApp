@@ -19,7 +19,7 @@ namespace NotesApp
             Normal,
             Overwrite
         }
-        enum WindowSizeStatuses
+        public enum WindowSizeStatuses
         {
             Normal,
             WaitingSettingsMenu,
@@ -27,7 +27,7 @@ namespace NotesApp
             Half
         }
         public DataTable table;
-        WindowSizeStatuses windowSizeStatus;
+        public WindowSizeStatuses windowSizeStatus;
         
         
 
@@ -42,17 +42,21 @@ namespace NotesApp
         public static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
         [DllImportAttribute("user32.dll")]
         public static extern bool ReleaseCapture();
+        private const int WM_SYSCOMMAND = 0x0112;
+        private const int SC_SIZE = 0xF000;
+        private const int WMSZ_BOTTOM = 6;
         // end bullshit
 
         // BEGIN SETTINGS
-        public Size windowSizeHalf = new Size(554, 481);
-        public Size windowSizeNormal = new Size(1027, 481);
-        public Size windowSizeSettings = new Size(1344, 481);
+        public bool firstLaunch = true;
 
-        //public Color formBackground = new Color(Color.FromArgb);
+        public int defaultWindowHeight = 550;
+        public int windowHeight;
+        public Size windowSizeHalf;
+        public Size windowSizeNormal;
+        public Size windowSizeSettings;
 
-
-
+        public string rootFolderName = "All";
 
 
 
@@ -62,10 +66,9 @@ namespace NotesApp
         // --------------------INITIALIZATION AND MISC--------------------
         public NotesApp()
         {
-            // SET ALL CONTROL PROPERTIES HERE
+            // BEGIN CONTROL PROPERTIES
             InitializeComponent();
-            windowSizeStatus = WindowSizeStatuses.Normal;
-            this.Size = windowSizeNormal;
+            
 
             // this controls the resize button's behaviors when holding control (accessing options menu)
             hoveringResizeButtonTimer = new System.Windows.Forms.Timer();
@@ -75,6 +78,7 @@ namespace NotesApp
             statusLabel.Visible = false;
             settingsGroup.Visible = false;
 
+            
             // set titlebar objects to be moveable by the mouse
             titleBar.MouseDown += (sender, e) =>
             {
@@ -86,20 +90,85 @@ namespace NotesApp
                 ReleaseCapture();
                 SendMessage(Handle, MW_NCLBUTTONDOWN, HT_CAPTION, 0);
             };
+            resizeBar.MouseDown += (sender, e) =>
+            {
+                ReleaseCapture();
+                SendMessage(Handle, WM_SYSCOMMAND, SC_SIZE + WMSZ_BOTTOM, 0);
+                windowHeight = this.Height;
+            };
             // END CONTROL PROPERTIES
+        }
+
+        private void updateWindowHeight(int height)
+        {
+            try
+            {
+                windowSizeHalf = new Size(554, height);
+                windowSizeNormal = new Size(1027, height);
+                windowSizeSettings = new Size(1344, height);
+            }
+            catch (Exception exception)
+            {
+                MessageHandler.DebugWrite("Could not update height!");
+            }
+            
         }
 
         private void LoadApp(object sender, EventArgs e)
         {
+            FormData data = Serializer.LoadData();
+            if (data != null)
+            {
+                firstLaunch = false;
+            }
+            if (firstLaunch)
+            {
+                // SET DEFAULT VALUES FOR FIRST LAUNCH HERE
+                windowSizeStatus = WindowSizeStatuses.Normal;
+                windowHeight = 550;
+                updateWindowHeight(windowHeight);
+                this.Size = windowSizeNormal;
+            }
+            else
+            {
+                // LOAD SETTINGS FROM DATA HERE
+
+                // begin window size load
+                windowSizeStatus = data.windowSizeStatus;
+                windowHeight = data.windowHeight;
+                updateWindowHeight(windowHeight);
+                switch (windowSizeStatus) // i might make a method to do this, but it might not be necessary (we'll see)
+                {
+                    case WindowSizeStatuses.Normal:
+                        this.Size = windowSizeNormal;
+                        resizeButton.Text = "□";
+                        break;
+                    case WindowSizeStatuses.Half:
+                        this.Size = windowSizeHalf;
+                        resizeButton.Text = "□□";
+                        break;
+                    case WindowSizeStatuses.SettingsMenu:
+                        this.Size = windowSizeSettings;
+                        settingsGroup.Visible = true;
+                        resizeButton.Text = "□□";
+                        break;
+                }
+                // end window size load
+                
+            }
+
+            // table nonsense
             try
             {
                 table = new DataTable();
-                table.Columns.Add("Title", typeof(String));
-                table.Columns.Add("Note", typeof(String));
-                table.Columns.Add("Date", typeof(DateTime));
+                table.Columns.Add("Title", typeof(string));
+                table.Columns.Add("Note", typeof(string));
+                table.Columns.Add("DateCreated", typeof(DateTime));
+                table.Columns.Add("DateModified", typeof(DateTime));
+                table.Columns.Add("Folder", typeof(string));
                 // add date type
 
-                FormData data = Serializer.LoadData();
+                
                 if (data == null)
                 {
                     MessageHandler.DebugWrite("No data found. Creating new table.");
@@ -115,7 +184,9 @@ namespace NotesApp
                         DataRow row = table.NewRow();
                         row["Title"] = data.packet.titles[index];
                         row["Note"] = data.packet.notes[index];
-                        row["Date"] = data.packet.dates[index];
+                        row["DateCreated"] = data.packet.originalDates[index];
+                        row["DateModified"] = data.packet.modifiedDates[index];
+                        row["Folder"] = data.packet.folders[index];
                     }
                     dataGridNotes.DataSource = table;
                 }
@@ -125,11 +196,14 @@ namespace NotesApp
 
                 dataGridNotes.Columns["Title"].Width = titleWidth;
                 dataGridNotes.Columns["Note"].Visible = false;
-                dataGridNotes.Columns["Date"].Visible = true;
-                dataGridNotes.Columns["Date"].Width = dateWidth;
+                dataGridNotes.Columns["DateCreated"].Visible = false;
+                dataGridNotes.Columns["DateModified"].Visible = true;
+                dataGridNotes.Columns["DateModified"].Width = dateWidth;
+                dataGridNotes.Columns["Folder"].Visible = false;
 
 
                 dataGridNotes.ClearSelection();
+                RefreshFolders();
                 
             }
             catch (Exception exception)
@@ -140,20 +214,27 @@ namespace NotesApp
 
         public RawRowsPacket GetRawRows()
         {
+            
             List<string> titles = new List<string>();
             List<string> notes = new List<string>();
-            List<DateTime> dates = new List<DateTime>();
+            List<DateTime> originalDates = new List<DateTime>();
+            List<DateTime> modifiedDates = new List<DateTime>();
+            List<string> folders = new List<string>();
             foreach (DataGridViewRow row in dataGridNotes.Rows)
             {
                 // add the cell values to each list
                 titles.Add(row.Cells[0].Value.ToString());
                 notes.Add(row.Cells[1].Value.ToString());
-                dates.Add(DateTime.Parse(row.Cells[2].Value.ToString()));
+                originalDates.Add(DateTime.Parse(row.Cells[2].Value.ToString()));
+                modifiedDates.Add(DateTime.Parse(row.Cells[3].Value.ToString()));
+                folders.Add(row.Cells[4].Value.ToString());
             }
             RawRowsPacket packet = new RawRowsPacket();
             packet.titles = titles;
             packet.notes = notes;
-            packet.dates = dates;
+            packet.originalDates = originalDates;
+            packet.modifiedDates = originalDates;
+            packet.folders = folders;
             return packet;
         }
 
@@ -201,7 +282,10 @@ namespace NotesApp
                 {
                     table.Rows[index].Delete();
                     MessageHandler.StatusMessage(statusLabel, $"Deleted note '{title}'.");
-                } 
+                }
+                RefreshDataGridNotesFolderList();
+                RefreshFolders();
+                
             }
             catch (Exception exception)
             {
@@ -233,16 +317,26 @@ namespace NotesApp
                         DialogResult result = CreateDialogPrompt($"A note called '{title}'", "already exists.", "Do you want to overwrite it?");
                         if (result == DialogResult.No) throw new Exception("cancelled operation.");
                         dataGridNotes.Rows[index].Cells[1].Value = noteTextBox.Text;
-                        dataGridNotes.Rows[index].Cells[2].Value = DateTime.Now;
+                        dataGridNotes.Rows[index].Cells[3].Value = DateTime.Now;
+
+                        // FUTURE: ADD FUNCTIONALITY FOR SAME NAME FILES IN DIFFERENT FOLDERS
+                        string folderName = folderComboBox.Text;
+                        dataGridNotes.Rows[index].Cells[4].Value = folderComboBox.Text;
                         MessageHandler.StatusMessage(statusLabel, $"Overwrote note '{title}'.");
+                        RefreshDataGridNotesFolderList();
+                        RefreshFolders();
+                        
                         status = SaveStatus.Overwrite;
                     }
+                    index++;
                 }
 
                 if (status == SaveStatus.Normal)
                 {
                     MessageHandler.StatusMessage(statusLabel, $"Saved note as '{titleTextBox.Text}'.");
-                    table.Rows.Add(titleTextBox.Text, noteTextBox.Text, DateTime.Now);
+                    table.Rows.Add(titleTextBox.Text, noteTextBox.Text, DateTime.Now, DateTime.Now, folderComboBox.Text);
+                    RefreshDataGridNotesFolderList();
+                    RefreshFolders();
                 }
                 
                 titleTextBox.Clear();
@@ -290,6 +384,8 @@ namespace NotesApp
                 titleTextBox.Text = table.Rows[index].ItemArray[0].ToString();
                 noteTextBox.Text = table.Rows[index].ItemArray[1].ToString();
                 MessageHandler.StatusMessage(statusLabel, $"Loaded note '{titleTextBox.Text}'.");
+
+                folderComboBox.Text = dataGridNotes.CurrentRow.Cells[4].Value.ToString();
             }
             catch (Exception exception)
             {
@@ -331,6 +427,7 @@ namespace NotesApp
         {
             // i would have to change this if i wanted the resize button to do other things,
             // but that probably wont happen lets be real
+            updateWindowHeight(windowHeight);
             if (!ctrlHeldResizeButton)
             {
                 switch (windowSizeStatus)
@@ -426,6 +523,127 @@ namespace NotesApp
             
         }
 
+        private void searchTextBox_KeyUp(object sender, KeyEventArgs e)
+        {
+            // again, we're comparing the title of each note to the contents of the search bar text, then acting accordingly.
+            foreach (DataGridViewRow row in dataGridNotes.Rows)
+            {
+                string title = row.Cells[0].Value.ToString();
+                string folder = row.Cells[4].Value.ToString();
+                dataGridNotes.CurrentCell = null; // this is necessary because if a cell is selected and it goes invisible, it crashes
+                if (searchTextBox.Text != "" && title.StartsWith(searchTextBox.Text, StringComparison.OrdinalIgnoreCase) && (folder == folderComboBox.Text || folderComboBox.Text == rootFolderName))
+                {
+                    row.Visible = true;
+                }
+                else if (searchTextBox.Text == "")
+                {
+                    row.Visible = true;
+                }
+                else
+                {
+                    row.Visible = false;
+                }
+            }
+        }
+
+        private void RefreshFolders()
+        {
+            List<string> folderNames = new List<string>();
+            /*
+             * This whole system is kinda complicated so im not surprised if ill forget how it works
+             * First we have to grab the rows and add the folder names to a list
+             * Then we clear the combo box's list
+             * and add every folder name to the combo box's list
+             * 
+             * its very clever
+             */
+            foreach (DataGridViewRow row in dataGridNotes.Rows)
+            {
+                DataGridViewCell folderCell = row.Cells[4];
+                string folderName = folderCell.Value.ToString();
+                if (!folderNames.Contains(folderName))
+                {
+                    folderNames.Add(folderName);
+                }
+                
+            }
+            folderComboBox.Items.Clear();
+            folderComboBox.Items.Add(rootFolderName);
+            MessageHandler.DebugWrite(folderNames);
+            foreach (string folderName in folderNames)
+            {
+                if (folderName != rootFolderName)
+                {
+                    folderComboBox.Items.Add(folderName);
+                }
+            }
+        }
+
+        private void RefreshDataGridNotesFolderList()
+        {
+            /*
+             * This method refreshes the dataGridView display according to the state of the combobox
+             * it also includes some behaviors that disable broken behavior, like having blank name folders
+             */
+            bool nameExists = false;
+            // determine if the string in combobox exists in its items list.
+            // if it doesn't, then add the string to the list temporarily so the user can look at a blank screen.
+            // if the user doesn't add a note under the folder's name, it'll be deleted through RefreshFolders()
+            foreach (string folderName in folderComboBox.Items)
+            {
+                if (folderComboBox.Text == folderName) nameExists = true;
+            }
+            if (!nameExists && folderComboBox.Text != "")
+            {
+                folderComboBox.Items.Add(folderComboBox.Text);
+            }
+            // this foreach loop is fairly straightforward, it just compares the text in the combobox to the row's folder category value
+            // once it's done a comparison, it acts accordingly
+            foreach (DataGridViewRow row in dataGridNotes.Rows)
+            {
+                DataGridViewCell folderCell = row.Cells[4];
+                string folderName = folderCell.Value.ToString();
+                dataGridNotes.CurrentCell = null; // this is necessary because if a cell is selected and it goes invisible, it crashes
+                if (folderComboBox.Text == rootFolderName)
+                {
+                    row.Visible = true;
+                }
+                else if (folderComboBox.Text != "" && folderName == folderComboBox.Text)
+                {
+                    row.Visible = true;
+                }
+                else
+                {
+                    row.Visible = false;
+                }
+            }
+            if (folderComboBox.Text == "")
+            {
+                folderComboBox.Text = rootFolderName;
+            }
+        }
+
+        private void folderComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            RefreshDataGridNotesFolderList();
+            
+        }
+
+        private void folderComboBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                RefreshDataGridNotesFolderList();
+                RefreshFolders();
+            }
+        }
+
+        private void folderComboBox_Leave(object sender, EventArgs e)
+        {
+            RefreshDataGridNotesFolderList();
+            RefreshFolders();
+        }
+
         // --------------------OPTIONS FIELDS--------------------
 
     }
@@ -436,46 +654,10 @@ namespace NotesApp
         public List<string> titles;
         public List<string> notes;
         public List<DateTime> dates;
+        public List<DateTime> originalDates;
+        public List<DateTime> modifiedDates;
+        public List<string> folders;
     }
 
-    public class MessageHandler
-    {
-        static System.Timers.Timer timer = new System.Timers.Timer(3000);
-
-        public static void DebugWrite(params string[] messages)
-        {
-            foreach (string message in messages)
-            {
-                System.Diagnostics.Debug.WriteLine(message);
-            }
-        }
-
-        public static void StatusMessage(System.Windows.Forms.Label label, string message)
-        {
-            timer.Stop();
-
-            // this is my dumbass patchwork way to reset the timer
-            timer.Enabled = false;
-            timer.Elapsed -= DummyEventHandler;
-            timer.Elapsed += DummyEventHandler;
-            timer.Enabled = true;
-
-            timer.Elapsed += (sender, e) =>
-            {
-                // this invoke ensures that the command inside is called on the same thread as the one that created the control
-                // without the invoke the program would crash when this is called
-                label.Invoke((MethodInvoker)delegate
-                {
-                    label.Visible = false;
-                });
-            };
-            timer.AutoReset = false;
-
-            label.Visible = true;
-            label.Text = message;
-            timer.Start();
-        }
-
-        public static void DummyEventHandler(object sender, EventArgs e) { }
-    }
+    
 }
