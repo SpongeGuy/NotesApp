@@ -30,25 +30,39 @@ namespace NotesApp
         private void InitializeComponent()
         {
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(NotesApp));
             this.dataGridNotes = new System.Windows.Forms.DataGridView();
             this.titleTextBox = new System.Windows.Forms.TextBox();
             this.noteTextBox = new System.Windows.Forms.TextBox();
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
-            this.button3 = new System.Windows.Forms.Button();
-            this.button4 = new System.Windows.Forms.Button();
+            this.clearButton = new System.Windows.Forms.Button();
+            this.saveButton = new System.Windows.Forms.Button();
+            this.readButton = new System.Windows.Forms.Button();
+            this.deleteButton = new System.Windows.Forms.Button();
             this.titleBar = new System.Windows.Forms.Panel();
             this.resizeButton = new System.Windows.Forms.Button();
             this.titleLabel = new System.Windows.Forms.Label();
-            this.buttonMinimize = new System.Windows.Forms.Button();
-            this.buttonExit = new System.Windows.Forms.Button();
+            this.minimizeButton = new System.Windows.Forms.Button();
+            this.exitButton = new System.Windows.Forms.Button();
             this.statusLabel = new System.Windows.Forms.Label();
             this.settingsGroup = new System.Windows.Forms.GroupBox();
+            this.colorComboBox = new System.Windows.Forms.ComboBox();
+            this.colorBLabel = new System.Windows.Forms.Label();
+            this.colorGLabel = new System.Windows.Forms.Label();
+            this.colorBTrackBar = new System.Windows.Forms.TrackBar();
+            this.colorGTrackBar = new System.Windows.Forms.TrackBar();
+            this.colorRLabel = new System.Windows.Forms.Label();
+            this.colorRTrackBar = new System.Windows.Forms.TrackBar();
+            this.settingDeleteWithoutPromptCheckBox = new System.Windows.Forms.CheckBox();
+            this.settingClearSaveWithoutPromptCheckBox = new System.Windows.Forms.CheckBox();
             this.resizeBar = new System.Windows.Forms.Panel();
             this.searchTextBox = new System.Windows.Forms.TextBox();
             this.folderComboBox = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridNotes)).BeginInit();
             this.titleBar.SuspendLayout();
+            this.settingsGroup.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.colorBTrackBar)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.colorGTrackBar)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.colorRTrackBar)).BeginInit();
             this.SuspendLayout();
             // 
             // dataGridNotes
@@ -111,64 +125,65 @@ namespace NotesApp
             this.noteTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.noteTextBox.Size = new System.Drawing.Size(529, 458);
             this.noteTextBox.TabIndex = 2;
+            this.noteTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.noteTextBox_KeyDown);
             // 
-            // button1
+            // clearButton
             // 
-            this.button1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(86)))), ((int)(((byte)(65)))), ((int)(((byte)(56)))));
-            this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.button1.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.button1.ForeColor = System.Drawing.Color.Gainsboro;
-            this.button1.Location = new System.Drawing.Point(385, 32);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 3;
-            this.button1.Text = "Clear";
-            this.button1.UseVisualStyleBackColor = false;
-            this.button1.Click += new System.EventHandler(this.clearButton_Click);
+            this.clearButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(86)))), ((int)(((byte)(65)))), ((int)(((byte)(56)))));
+            this.clearButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.clearButton.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.clearButton.ForeColor = System.Drawing.Color.Gainsboro;
+            this.clearButton.Location = new System.Drawing.Point(385, 32);
+            this.clearButton.Name = "clearButton";
+            this.clearButton.Size = new System.Drawing.Size(75, 23);
+            this.clearButton.TabIndex = 3;
+            this.clearButton.Text = "Clear";
+            this.clearButton.UseVisualStyleBackColor = false;
+            this.clearButton.Click += new System.EventHandler(this.clearButton_Click);
             // 
-            // button2
+            // saveButton
             // 
-            this.button2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(86)))), ((int)(((byte)(65)))), ((int)(((byte)(56)))));
-            this.button2.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.button2.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.button2.ForeColor = System.Drawing.Color.Gainsboro;
-            this.button2.Location = new System.Drawing.Point(466, 32);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
-            this.button2.TabIndex = 4;
-            this.button2.Text = "Save";
-            this.button2.UseVisualStyleBackColor = false;
-            this.button2.Click += new System.EventHandler(this.saveButton_Click);
+            this.saveButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(86)))), ((int)(((byte)(65)))), ((int)(((byte)(56)))));
+            this.saveButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.saveButton.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.saveButton.ForeColor = System.Drawing.Color.Gainsboro;
+            this.saveButton.Location = new System.Drawing.Point(466, 32);
+            this.saveButton.Name = "saveButton";
+            this.saveButton.Size = new System.Drawing.Size(75, 23);
+            this.saveButton.TabIndex = 4;
+            this.saveButton.Text = "Save";
+            this.saveButton.UseVisualStyleBackColor = false;
+            this.saveButton.Click += new System.EventHandler(this.saveButton_Click);
             // 
-            // button3
+            // readButton
             // 
-            this.button3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.button3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(86)))), ((int)(((byte)(65)))), ((int)(((byte)(56)))));
-            this.button3.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.button3.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.button3.ForeColor = System.Drawing.Color.Gainsboro;
-            this.button3.Location = new System.Drawing.Point(385, 525);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(75, 23);
-            this.button3.TabIndex = 5;
-            this.button3.Text = "Read";
-            this.button3.UseVisualStyleBackColor = false;
-            this.button3.Click += new System.EventHandler(this.readButton_Click);
+            this.readButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.readButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(86)))), ((int)(((byte)(65)))), ((int)(((byte)(56)))));
+            this.readButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.readButton.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.readButton.ForeColor = System.Drawing.Color.Gainsboro;
+            this.readButton.Location = new System.Drawing.Point(385, 525);
+            this.readButton.Name = "readButton";
+            this.readButton.Size = new System.Drawing.Size(75, 23);
+            this.readButton.TabIndex = 5;
+            this.readButton.Text = "Read";
+            this.readButton.UseVisualStyleBackColor = false;
+            this.readButton.Click += new System.EventHandler(this.readButton_Click);
             // 
-            // button4
+            // deleteButton
             // 
-            this.button4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.button4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(86)))), ((int)(((byte)(65)))), ((int)(((byte)(56)))));
-            this.button4.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.button4.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.button4.ForeColor = System.Drawing.Color.Gainsboro;
-            this.button4.Location = new System.Drawing.Point(466, 525);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(75, 23);
-            this.button4.TabIndex = 6;
-            this.button4.Text = "Delete";
-            this.button4.UseVisualStyleBackColor = false;
-            this.button4.Click += new System.EventHandler(this.deleteButton_Click);
+            this.deleteButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.deleteButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(86)))), ((int)(((byte)(65)))), ((int)(((byte)(56)))));
+            this.deleteButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.deleteButton.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.deleteButton.ForeColor = System.Drawing.Color.Gainsboro;
+            this.deleteButton.Location = new System.Drawing.Point(466, 525);
+            this.deleteButton.Name = "deleteButton";
+            this.deleteButton.Size = new System.Drawing.Size(75, 23);
+            this.deleteButton.TabIndex = 6;
+            this.deleteButton.Text = "Delete";
+            this.deleteButton.UseVisualStyleBackColor = false;
+            this.deleteButton.Click += new System.EventHandler(this.deleteButton_Click);
             // 
             // titleBar
             // 
@@ -177,8 +192,8 @@ namespace NotesApp
             this.titleBar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(46)))), ((int)(((byte)(38)))), ((int)(((byte)(35)))));
             this.titleBar.Controls.Add(this.resizeButton);
             this.titleBar.Controls.Add(this.titleLabel);
-            this.titleBar.Controls.Add(this.buttonMinimize);
-            this.titleBar.Controls.Add(this.buttonExit);
+            this.titleBar.Controls.Add(this.minimizeButton);
+            this.titleBar.Controls.Add(this.exitButton);
             this.titleBar.Location = new System.Drawing.Point(-3, -5);
             this.titleBar.Name = "titleBar";
             this.titleBar.Size = new System.Drawing.Size(1344, 29);
@@ -216,43 +231,43 @@ namespace NotesApp
             this.titleLabel.TabIndex = 2;
             this.titleLabel.Text = "Notes";
             // 
-            // buttonMinimize
+            // minimizeButton
             // 
-            this.buttonMinimize.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.buttonMinimize.BackColor = System.Drawing.Color.Transparent;
-            this.buttonMinimize.FlatAppearance.BorderSize = 0;
-            this.buttonMinimize.FlatAppearance.MouseDownBackColor = System.Drawing.Color.DarkKhaki;
-            this.buttonMinimize.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Olive;
-            this.buttonMinimize.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.buttonMinimize.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.buttonMinimize.ForeColor = System.Drawing.Color.Gainsboro;
-            this.buttonMinimize.Location = new System.Drawing.Point(1173, 1);
-            this.buttonMinimize.Name = "buttonMinimize";
-            this.buttonMinimize.Size = new System.Drawing.Size(57, 29);
-            this.buttonMinimize.TabIndex = 1;
-            this.buttonMinimize.TabStop = false;
-            this.buttonMinimize.Text = "-";
-            this.buttonMinimize.UseVisualStyleBackColor = false;
-            this.buttonMinimize.Click += new System.EventHandler(this.minimizeButton_Click);
+            this.minimizeButton.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.minimizeButton.BackColor = System.Drawing.Color.Transparent;
+            this.minimizeButton.FlatAppearance.BorderSize = 0;
+            this.minimizeButton.FlatAppearance.MouseDownBackColor = System.Drawing.Color.DarkKhaki;
+            this.minimizeButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Olive;
+            this.minimizeButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.minimizeButton.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.minimizeButton.ForeColor = System.Drawing.Color.Gainsboro;
+            this.minimizeButton.Location = new System.Drawing.Point(1173, 1);
+            this.minimizeButton.Name = "minimizeButton";
+            this.minimizeButton.Size = new System.Drawing.Size(57, 29);
+            this.minimizeButton.TabIndex = 1;
+            this.minimizeButton.TabStop = false;
+            this.minimizeButton.Text = "-";
+            this.minimizeButton.UseVisualStyleBackColor = false;
+            this.minimizeButton.Click += new System.EventHandler(this.minimizeButton_Click);
             // 
-            // buttonExit
+            // exitButton
             // 
-            this.buttonExit.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.buttonExit.BackColor = System.Drawing.Color.Transparent;
-            this.buttonExit.FlatAppearance.BorderSize = 0;
-            this.buttonExit.FlatAppearance.MouseDownBackColor = System.Drawing.Color.DarkKhaki;
-            this.buttonExit.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(117)))), ((int)(((byte)(30)))), ((int)(((byte)(17)))));
-            this.buttonExit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.buttonExit.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.buttonExit.ForeColor = System.Drawing.Color.Gainsboro;
-            this.buttonExit.Location = new System.Drawing.Point(1287, 1);
-            this.buttonExit.Name = "buttonExit";
-            this.buttonExit.Size = new System.Drawing.Size(57, 29);
-            this.buttonExit.TabIndex = 0;
-            this.buttonExit.TabStop = false;
-            this.buttonExit.Text = "X";
-            this.buttonExit.UseVisualStyleBackColor = false;
-            this.buttonExit.Click += new System.EventHandler(this.exitButton_Click);
+            this.exitButton.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.exitButton.BackColor = System.Drawing.Color.Transparent;
+            this.exitButton.FlatAppearance.BorderSize = 0;
+            this.exitButton.FlatAppearance.MouseDownBackColor = System.Drawing.Color.DarkKhaki;
+            this.exitButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(117)))), ((int)(((byte)(30)))), ((int)(((byte)(17)))));
+            this.exitButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.exitButton.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.exitButton.ForeColor = System.Drawing.Color.Gainsboro;
+            this.exitButton.Location = new System.Drawing.Point(1287, 1);
+            this.exitButton.Name = "exitButton";
+            this.exitButton.Size = new System.Drawing.Size(57, 29);
+            this.exitButton.TabIndex = 0;
+            this.exitButton.TabStop = false;
+            this.exitButton.Text = "X";
+            this.exitButton.UseVisualStyleBackColor = false;
+            this.exitButton.Click += new System.EventHandler(this.exitButton_Click);
             // 
             // statusLabel
             // 
@@ -270,6 +285,15 @@ namespace NotesApp
             // 
             this.settingsGroup.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+            this.settingsGroup.Controls.Add(this.colorComboBox);
+            this.settingsGroup.Controls.Add(this.colorBLabel);
+            this.settingsGroup.Controls.Add(this.colorGLabel);
+            this.settingsGroup.Controls.Add(this.colorBTrackBar);
+            this.settingsGroup.Controls.Add(this.colorGTrackBar);
+            this.settingsGroup.Controls.Add(this.colorRLabel);
+            this.settingsGroup.Controls.Add(this.colorRTrackBar);
+            this.settingsGroup.Controls.Add(this.settingDeleteWithoutPromptCheckBox);
+            this.settingsGroup.Controls.Add(this.settingClearSaveWithoutPromptCheckBox);
             this.settingsGroup.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.settingsGroup.ForeColor = System.Drawing.Color.Gainsboro;
             this.settingsGroup.Location = new System.Drawing.Point(1019, 32);
@@ -278,6 +302,110 @@ namespace NotesApp
             this.settingsGroup.TabIndex = 9;
             this.settingsGroup.TabStop = false;
             this.settingsGroup.Text = "Settings";
+            // 
+            // colorComboBox
+            // 
+            this.colorComboBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.colorComboBox.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.colorComboBox.ForeColor = System.Drawing.Color.Gainsboro;
+            this.colorComboBox.FormattingEnabled = true;
+            this.colorComboBox.Items.AddRange(new object[] {
+            "Background",
+            "TextBox",
+            "Button",
+            "TitleBar",
+            "Highlight",
+            "Text",
+            ""});
+            this.colorComboBox.Location = new System.Drawing.Point(15, 69);
+            this.colorComboBox.Name = "colorComboBox";
+            this.colorComboBox.Size = new System.Drawing.Size(138, 22);
+            this.colorComboBox.TabIndex = 13;
+            this.colorComboBox.SelectedIndexChanged += new System.EventHandler(this.colorComboBox_SelectedIndexChanged);
+            // 
+            // colorBLabel
+            // 
+            this.colorBLabel.AutoSize = true;
+            this.colorBLabel.Location = new System.Drawing.Point(252, 145);
+            this.colorBLabel.Name = "colorBLabel";
+            this.colorBLabel.Size = new System.Drawing.Size(28, 14);
+            this.colorBLabel.TabIndex = 7;
+            this.colorBLabel.Text = "255";
+            // 
+            // colorGLabel
+            // 
+            this.colorGLabel.AutoSize = true;
+            this.colorGLabel.Location = new System.Drawing.Point(252, 123);
+            this.colorGLabel.Name = "colorGLabel";
+            this.colorGLabel.Size = new System.Drawing.Size(28, 14);
+            this.colorGLabel.TabIndex = 6;
+            this.colorGLabel.Text = "255";
+            // 
+            // colorBTrackBar
+            // 
+            this.colorBTrackBar.Location = new System.Drawing.Point(6, 141);
+            this.colorBTrackBar.Maximum = 255;
+            this.colorBTrackBar.Name = "colorBTrackBar";
+            this.colorBTrackBar.Size = new System.Drawing.Size(250, 45);
+            this.colorBTrackBar.TabIndex = 5;
+            this.colorBTrackBar.TabStop = false;
+            this.colorBTrackBar.TickStyle = System.Windows.Forms.TickStyle.None;
+            this.colorBTrackBar.Scroll += new System.EventHandler(this.colorTrackBar_Scroll);
+            // 
+            // colorGTrackBar
+            // 
+            this.colorGTrackBar.Location = new System.Drawing.Point(6, 119);
+            this.colorGTrackBar.Maximum = 255;
+            this.colorGTrackBar.Name = "colorGTrackBar";
+            this.colorGTrackBar.Size = new System.Drawing.Size(250, 45);
+            this.colorGTrackBar.TabIndex = 4;
+            this.colorGTrackBar.TabStop = false;
+            this.colorGTrackBar.TickStyle = System.Windows.Forms.TickStyle.None;
+            this.colorGTrackBar.Scroll += new System.EventHandler(this.colorTrackBar_Scroll);
+            // 
+            // colorRLabel
+            // 
+            this.colorRLabel.AutoSize = true;
+            this.colorRLabel.Location = new System.Drawing.Point(252, 101);
+            this.colorRLabel.Name = "colorRLabel";
+            this.colorRLabel.Size = new System.Drawing.Size(28, 14);
+            this.colorRLabel.TabIndex = 3;
+            this.colorRLabel.Text = "255";
+            // 
+            // colorRTrackBar
+            // 
+            this.colorRTrackBar.Location = new System.Drawing.Point(6, 97);
+            this.colorRTrackBar.Maximum = 255;
+            this.colorRTrackBar.Name = "colorRTrackBar";
+            this.colorRTrackBar.Size = new System.Drawing.Size(250, 45);
+            this.colorRTrackBar.TabIndex = 2;
+            this.colorRTrackBar.TabStop = false;
+            this.colorRTrackBar.TickStyle = System.Windows.Forms.TickStyle.None;
+            this.colorRTrackBar.Scroll += new System.EventHandler(this.colorTrackBar_Scroll);
+            // 
+            // settingDeleteWithoutPromptCheckBox
+            // 
+            this.settingDeleteWithoutPromptCheckBox.AutoSize = true;
+            this.settingDeleteWithoutPromptCheckBox.Location = new System.Drawing.Point(15, 45);
+            this.settingDeleteWithoutPromptCheckBox.Name = "settingDeleteWithoutPromptCheckBox";
+            this.settingDeleteWithoutPromptCheckBox.Size = new System.Drawing.Size(215, 18);
+            this.settingDeleteWithoutPromptCheckBox.TabIndex = 1;
+            this.settingDeleteWithoutPromptCheckBox.TabStop = false;
+            this.settingDeleteWithoutPromptCheckBox.Text = "Delete notes without prompt";
+            this.settingDeleteWithoutPromptCheckBox.UseVisualStyleBackColor = true;
+            this.settingDeleteWithoutPromptCheckBox.CheckedChanged += new System.EventHandler(this.settingDeleteWithoutPromptCheckBox_CheckedChanged);
+            // 
+            // settingClearSaveWithoutPromptCheckBox
+            // 
+            this.settingClearSaveWithoutPromptCheckBox.AutoSize = true;
+            this.settingClearSaveWithoutPromptCheckBox.Location = new System.Drawing.Point(15, 21);
+            this.settingClearSaveWithoutPromptCheckBox.Name = "settingClearSaveWithoutPromptCheckBox";
+            this.settingClearSaveWithoutPromptCheckBox.Size = new System.Drawing.Size(236, 18);
+            this.settingClearSaveWithoutPromptCheckBox.TabIndex = 0;
+            this.settingClearSaveWithoutPromptCheckBox.TabStop = false;
+            this.settingClearSaveWithoutPromptCheckBox.Text = "Clear/Save note without prompt";
+            this.settingClearSaveWithoutPromptCheckBox.UseVisualStyleBackColor = true;
+            this.settingClearSaveWithoutPromptCheckBox.CheckedChanged += new System.EventHandler(this.settingClearSaveWithoutPromptCheckBox_CheckedChanged);
             // 
             // resizeBar
             // 
@@ -330,14 +458,15 @@ namespace NotesApp
             this.Controls.Add(this.settingsGroup);
             this.Controls.Add(this.statusLabel);
             this.Controls.Add(this.titleBar);
-            this.Controls.Add(this.button4);
-            this.Controls.Add(this.button3);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.deleteButton);
+            this.Controls.Add(this.readButton);
+            this.Controls.Add(this.saveButton);
+            this.Controls.Add(this.clearButton);
             this.Controls.Add(this.noteTextBox);
             this.Controls.Add(this.titleTextBox);
             this.Controls.Add(this.dataGridNotes);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(550, 35);
             this.Name = "NotesApp";
             this.Text = "Notes";
@@ -345,6 +474,11 @@ namespace NotesApp
             ((System.ComponentModel.ISupportInitialize)(this.dataGridNotes)).EndInit();
             this.titleBar.ResumeLayout(false);
             this.titleBar.PerformLayout();
+            this.settingsGroup.ResumeLayout(false);
+            this.settingsGroup.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.colorBTrackBar)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.colorGTrackBar)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.colorRTrackBar)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -355,13 +489,13 @@ namespace NotesApp
         private System.Windows.Forms.DataGridView dataGridNotes;
         private System.Windows.Forms.TextBox titleTextBox;
         private System.Windows.Forms.TextBox noteTextBox;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.Button clearButton;
+        private System.Windows.Forms.Button saveButton;
+        private System.Windows.Forms.Button readButton;
+        private System.Windows.Forms.Button deleteButton;
         private System.Windows.Forms.Panel titleBar;
-        private System.Windows.Forms.Button buttonExit;
-        private System.Windows.Forms.Button buttonMinimize;
+        private System.Windows.Forms.Button exitButton;
+        private System.Windows.Forms.Button minimizeButton;
         private System.Windows.Forms.Label statusLabel;
         private System.Windows.Forms.Label titleLabel;
         private System.Windows.Forms.Button resizeButton;
@@ -369,6 +503,15 @@ namespace NotesApp
         private System.Windows.Forms.Panel resizeBar;
         private System.Windows.Forms.TextBox searchTextBox;
         private System.Windows.Forms.ComboBox folderComboBox;
+        private System.Windows.Forms.CheckBox settingDeleteWithoutPromptCheckBox;
+        private System.Windows.Forms.CheckBox settingClearSaveWithoutPromptCheckBox;
+        private System.Windows.Forms.TrackBar colorRTrackBar;
+        private System.Windows.Forms.Label colorRLabel;
+        private System.Windows.Forms.Label colorBLabel;
+        private System.Windows.Forms.Label colorGLabel;
+        private System.Windows.Forms.TrackBar colorBTrackBar;
+        private System.Windows.Forms.TrackBar colorGTrackBar;
+        private System.Windows.Forms.ComboBox colorComboBox;
     }
 }
 

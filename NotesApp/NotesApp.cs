@@ -26,10 +26,11 @@ namespace NotesApp
             SettingsMenu,
             Half
         }
+        
         public DataTable table;
         public WindowSizeStatuses windowSizeStatus;
-        
-        
+
+        public string rootFolderName = "All";
 
         // resize button holding control behaviors
         private System.Windows.Forms.Timer hoveringResizeButtonTimer;
@@ -50,25 +51,55 @@ namespace NotesApp
         // BEGIN SETTINGS
         public bool firstLaunch = true;
 
+        // window height
         public int defaultWindowHeight = 550;
         public int windowHeight;
         public Size windowSizeHalf;
         public Size windowSizeNormal;
         public Size windowSizeSettings;
 
-        public string rootFolderName = "All";
+        // window prompt
+        public bool settingDeleteWithoutPrompt;
+        public bool settingClearSaveWithoutPrompt;
 
+        // colors
+        enum ColorEditStatus
+        {
+            Background,
+            TitleBar,
+            Button,
+            Text,
+            Highlight,
+            TextBox
+        }
 
+        public Color backgroundColor;
+        public Color titleBarColor;
+        public Color buttonColor;
+        public Color textColor;
+        public Color highlightColor;
+        public Color textBoxColor;
+        ColorEditStatus colorEditStatus;
+        
+        
+
+        List<Control> controlsWithText = new List<Control>();
+        List<Control> buttons = new List<Control>();
+        List<Control> textBoxes = new List<Control>();
+        List<Control> titleControls = new List<Control>();
 
         // END SETTINGS
 
 
-        // --------------------INITIALIZATION AND MISC--------------------
+        // BEGIN INIT AND MISC
         public NotesApp()
         {
+            colorEditStatus = ColorEditStatus.Background;
+
             // BEGIN CONTROL PROPERTIES
             InitializeComponent();
-            
+
+            populateControlLists();
 
             // this controls the resize button's behaviors when holding control (accessing options menu)
             hoveringResizeButtonTimer = new System.Windows.Forms.Timer();
@@ -99,19 +130,39 @@ namespace NotesApp
             // END CONTROL PROPERTIES
         }
 
-        private void updateWindowHeight(int height)
+        private void populateControlLists()
         {
-            try
+
+            titleControls.Add(titleBar);
+            titleControls.Add(minimizeButton);
+            titleControls.Add(resizeButton);
+            titleControls.Add(exitButton);
+            titleControls.Add(resizeBar);
+
+            foreach (Control control in this.Controls)
             {
-                windowSizeHalf = new Size(554, height);
-                windowSizeNormal = new Size(1027, height);
-                windowSizeSettings = new Size(1344, height);
+                Type controlType = control.GetType();
+                bool hasTextProperty = controlType.GetProperty("Text") != null;
+                if (hasTextProperty)
+                {
+                    controlsWithText.Add(control);
+                }
+                if (control is Button)
+                {
+                    buttons.Add(control);
+                }
+                if (control is TextBox or ComboBox)
+                {
+                    textBoxes.Add(control);
+                }
             }
-            catch (Exception exception)
-            {
-                MessageHandler.DebugWrite("Could not update height!");
-            }
-            
+            // im not sure why I have to do this, but I guess i do otherwise it wont be in the lists
+            controlsWithText.Add(colorComboBox);
+            textBoxes.Add(colorComboBox);
+            controlsWithText.Add(titleLabel);
+            controlsWithText.Add(minimizeButton);
+            controlsWithText.Add(resizeButton);
+            controlsWithText.Add(exitButton);
         }
 
         private void LoadApp(object sender, EventArgs e)
@@ -121,19 +172,47 @@ namespace NotesApp
             {
                 firstLaunch = false;
             }
+            //debug
+            //firstLaunch = true;
             if (firstLaunch)
             {
+                MessageHandler.DebugWrite("First launch. Populating settings with default values.");
                 // SET DEFAULT VALUES FOR FIRST LAUNCH HERE
+                // window height
                 windowSizeStatus = WindowSizeStatuses.Normal;
                 windowHeight = 550;
                 updateWindowHeight(windowHeight);
                 this.Size = windowSizeNormal;
+
+                // warning prompt
+                setClearSaveWithoutPrompt(false);
+                setDeleteWithoutPrompt(false);
+                updateColorLabels();
+
+                // colors
+                updateColorLabels();
+                colorEditStatus = ColorEditStatus.Background;
+                colorComboBox.Text = colorEditStatus.ToString();
+
+                backgroundColor = Color.FromArgb(32, 31, 28);
+                highlightColor = Color.FromArgb(171, 156, 145);
+                titleBarColor = Color.FromArgb(46, 38, 35);
+                textBoxColor = Color.FromArgb(64, 64, 64);
+                buttonColor = Color.FromArgb(86, 65, 56);
+                textColor = Color.Gainsboro;
+                
+                
+
+                updateColorTrackBarValues();
+
+
             }
             else
             {
+                MessageHandler.DebugWrite("Launching. Populating settings with values from data.spig.");
                 // LOAD SETTINGS FROM DATA HERE
 
-                // begin window size load
+                // window height
                 windowSizeStatus = data.windowSizeStatus;
                 windowHeight = data.windowHeight;
                 updateWindowHeight(windowHeight);
@@ -153,8 +232,37 @@ namespace NotesApp
                         resizeButton.Text = "□□";
                         break;
                 }
-                // end window size load
+
+                // warning prompt
+                setClearSaveWithoutPrompt(data.settingClearSaveWithoutPrompt);
+                setDeleteWithoutPrompt(data.settingDeleteWithoutPrompt);
+
+                // colors
                 
+                backgroundColor = data.backgroundColor;
+                highlightColor = data.highlightColor;
+                titleBarColor = data.titleBarColor;
+                textBoxColor = data.textBoxColor;
+                buttonColor = data.buttonColor;
+                textColor = data.textColor;
+                // loop through color edit status because that's how I wrote updateColors() like adummy
+                this.SuspendLayout();
+                for (int i = 0; i < Enum.GetValues(typeof(ColorEditStatus)).Length; i++)
+                {
+                    colorEditStatus = (ColorEditStatus)Enum.Parse(typeof(ColorEditStatus), i.ToString());
+                    MessageHandler.DebugWrite(colorEditStatus.ToString());
+                    updateColorTrackBarValues();
+                    updateColors();
+                }
+                colorEditStatus = ColorEditStatus.Background;
+                colorComboBox.Text = colorEditStatus.ToString();
+                updateColorLabels();
+                this.ResumeLayout();
+
+
+
+
+
             }
 
             // table nonsense
@@ -238,11 +346,11 @@ namespace NotesApp
             return packet;
         }
 
-        private DialogResult CreateDialogPrompt(params string[] messages)
+        private DialogPrompt CreateDialogPrompt(params string[] messages)
         {
             DialogPrompt prompt = new DialogPrompt();
             prompt.ChangePromptMessage(messages);
-            return prompt.ShowDialog();
+            return prompt;
         }
 
         private void unfocusCurrentCell()
@@ -254,46 +362,7 @@ namespace NotesApp
             }
         }
 
-        private void safelyCloseApp()
-        {
-            Serializer.SaveData(this);
-            this.Close();
-        }
-
-        // --------------------BUTTONS BEHAVIORS--------------------
-        private void minimizeButton_Click(object sender, EventArgs e)
-        {
-            this.WindowState = FormWindowState.Minimized;
-            unfocusCurrentCell();
-        }
-
-        private void deleteButton_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                // check if datagridview's content is there
-                if (dataGridNotes.Rows.Count <= 0 || dataGridNotes.CurrentCell == null) throw new Exception("invalid cell selection!");
-                
-
-                int index = dataGridNotes.CurrentCell.RowIndex;
-                string title = dataGridNotes.Rows[index].Cells[0].Value.ToString();
-                DialogResult result = CreateDialogPrompt("Are you sure you want to", "delete this note?", $"Everything in '{title}'", "will be lost.");
-                if (result == DialogResult.Yes)
-                {
-                    table.Rows[index].Delete();
-                    MessageHandler.StatusMessage(statusLabel, $"Deleted note '{title}'.");
-                }
-                RefreshDataGridNotesFolderList();
-                RefreshFolders();
-                
-            }
-            catch (Exception exception)
-            {
-                MessageHandler.StatusMessage(statusLabel, "Couldn't delete: " + exception.Message);
-            }
-        }
-
-        private void saveButton_Click(object sender, EventArgs e)
+        private void saveNote()
         {
             // add support for ctrl+s
             SaveStatus status = SaveStatus.Normal;
@@ -314,7 +383,15 @@ namespace NotesApp
                 {
                     if (titleTextBox.Text == title)
                     {
-                        DialogResult result = CreateDialogPrompt($"A note called '{title}'", "already exists.", "Do you want to overwrite it?");
+                        DialogPrompt prompt = CreateDialogPrompt($"A note called '{title}'", "already exists.", "Do you want to overwrite it?");
+                        DialogResult result;
+                        if (!settingClearSaveWithoutPrompt)
+                        {
+                            result = prompt.ShowDialog();
+                        }
+                        else result = DialogResult.Yes;
+                        if (prompt.isDontAskAgainChecked) setClearSaveWithoutPrompt(true);
+
                         if (result == DialogResult.No) throw new Exception("cancelled operation.");
                         dataGridNotes.Rows[index].Cells[1].Value = noteTextBox.Text;
                         dataGridNotes.Rows[index].Cells[3].Value = DateTime.Now;
@@ -325,7 +402,7 @@ namespace NotesApp
                         MessageHandler.StatusMessage(statusLabel, $"Overwrote note '{title}'.");
                         RefreshDataGridNotesFolderList();
                         RefreshFolders();
-                        
+
                         status = SaveStatus.Overwrite;
                     }
                     index++;
@@ -338,9 +415,6 @@ namespace NotesApp
                     RefreshDataGridNotesFolderList();
                     RefreshFolders();
                 }
-                
-                titleTextBox.Clear();
-                noteTextBox.Clear();
                 unfocusCurrentCell();
             }
             catch (Exception exception)
@@ -351,6 +425,70 @@ namespace NotesApp
             {
                 Serializer.SaveData(this);
             }
+        }
+
+        private void safelyCloseApp()
+        {
+            Serializer.SaveData(this);
+            this.Close();
+        }
+
+        private void updateWindowHeight(int height)
+        {
+            try
+            {
+                windowSizeHalf = new Size(554, height);
+                windowSizeNormal = new Size(1027, height);
+                windowSizeSettings = new Size(1344, height);
+            }
+            catch (Exception exception)
+            {
+                MessageHandler.DebugWrite("Could not update height!");
+            }
+
+        }
+
+        // END INIT AND MISC
+
+
+
+        // BEGIN BUTTON FUNCTIONS
+        private void minimizeButton_Click(object sender, EventArgs e)
+        {
+            this.WindowState = FormWindowState.Minimized;
+            unfocusCurrentCell();
+        }
+
+        private void deleteButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // check if datagridview's content is there
+                if (dataGridNotes.Rows.Count <= 0 || dataGridNotes.CurrentCell == null) throw new Exception("invalid cell selection!");
+                
+
+                int index = dataGridNotes.CurrentCell.RowIndex;
+                string title = dataGridNotes.Rows[index].Cells[0].Value.ToString();
+                DialogPrompt prompt = CreateDialogPrompt("Are you sure you want to", "delete this note?", $"Everything in '{title}'", "will be lost.");
+                DialogResult result = prompt.ShowDialog();
+                if (result == DialogResult.Yes)
+                {
+                    table.Rows[index].Delete();
+                    MessageHandler.StatusMessage(statusLabel, $"Deleted note '{title}'.");
+                }
+                RefreshDataGridNotesFolderList();
+                RefreshFolders();
+                
+            }
+            catch (Exception exception)
+            {
+                MessageHandler.StatusMessage(statusLabel, "Couldn't delete: " + exception.Message);
+            }
+        }
+
+        private void saveButton_Click(object sender, EventArgs e)
+        {
+            saveNote();
         }
 
         private void readButton_Click(object sender, EventArgs e)
@@ -370,39 +508,13 @@ namespace NotesApp
             }
         }
 
-        private void cell_DoubleClick(object sender, DataGridViewCellEventArgs e)
-        {
-            try
-            {
-                // check if datagridview's content is there
-                if (dataGridNotes.Rows.Count <= 0 || dataGridNotes.CurrentCell == null) throw new Exception("invalid cell selection!");
-                
-                // check if cell doesn't exist (idfk how this would happen)
-                int index = dataGridNotes.CurrentCell.RowIndex;
-                if (index <= -1) throw new Exception("cell is null!");
-
-                titleTextBox.Text = table.Rows[index].ItemArray[0].ToString();
-                noteTextBox.Text = table.Rows[index].ItemArray[1].ToString();
-                MessageHandler.StatusMessage(statusLabel, $"Loaded note '{titleTextBox.Text}'.");
-
-                folderComboBox.Text = dataGridNotes.CurrentRow.Cells[4].Value.ToString();
-            }
-            catch (Exception exception)
-            {
-                MessageHandler.StatusMessage(statusLabel, "Couldn't open: " + exception.Message);
-            }
-            finally
-            {
-                unfocusCurrentCell();
-            }
-        }
-
         private void clearButton_Click(object sender, EventArgs e)
         {
             try
             {
                 if (titleTextBox.Text == "" && noteTextBox.Text == "") throw new Exception("no text in fields.");
-                DialogResult result = CreateDialogPrompt("Are you sure you want to", "clear your title and note?", "All progress will be lost.");
+                DialogPrompt prompt = CreateDialogPrompt("Are you sure you want to", "clear your title and note?", "All progress will be lost.");
+                DialogResult result = prompt.ShowDialog();
                 if (result == DialogResult.Yes)
                 {
                     noteTextBox.Clear();
@@ -523,15 +635,29 @@ namespace NotesApp
             
         }
 
+        // BEGIN SEARCH FUNCTIONS
+
         private void searchTextBox_KeyUp(object sender, KeyEventArgs e)
         {
             // again, we're comparing the title of each note to the contents of the search bar text, then acting accordingly.
             foreach (DataGridViewRow row in dataGridNotes.Rows)
             {
+                // define elements needed for conditions
                 string title = row.Cells[0].Value.ToString();
+                DateTime date = DateTime.Parse(row.Cells[3].Value.ToString());
+                string yearString = date.ToString("yyyy");
+                string timeString = date.ToString("hh:mm tt");
                 string folder = row.Cells[4].Value.ToString();
                 dataGridNotes.CurrentCell = null; // this is necessary because if a cell is selected and it goes invisible, it crashes
-                if (searchTextBox.Text != "" && title.StartsWith(searchTextBox.Text, StringComparison.OrdinalIgnoreCase) && (folder == folderComboBox.Text || folderComboBox.Text == rootFolderName))
+                // define conditions for the search to be conclusive
+                bool titleCondidion = title.StartsWith(searchTextBox.Text, StringComparison.OrdinalIgnoreCase);
+                bool blankCondition = searchTextBox.Text != "";
+                bool comboBoxCondition = folder == folderComboBox.Text || folderComboBox.Text == rootFolderName;
+                bool dateCondition = date.ToString().StartsWith(searchTextBox.Text);
+                bool yearCondition = yearString.StartsWith(searchTextBox.Text);
+                bool timeCondition = timeString.StartsWith(searchTextBox.Text);
+                // begin the search
+                if (blankCondition && (titleCondidion || dateCondition || yearCondition || timeCondition) && comboBoxCondition)
                 {
                     row.Visible = true;
                 }
@@ -548,6 +674,7 @@ namespace NotesApp
 
         private void RefreshFolders()
         {
+            MessageHandler.DebugWrite("Refreshing folders!");
             List<string> folderNames = new List<string>();
             /*
              * This whole system is kinda complicated so im not surprised if ill forget how it works
@@ -569,7 +696,6 @@ namespace NotesApp
             }
             folderComboBox.Items.Clear();
             folderComboBox.Items.Add(rootFolderName);
-            MessageHandler.DebugWrite(folderNames);
             foreach (string folderName in folderNames)
             {
                 if (folderName != rootFolderName)
@@ -581,6 +707,7 @@ namespace NotesApp
 
         private void RefreshDataGridNotesFolderList()
         {
+            MessageHandler.DebugWrite("Refreshing folder list!");
             /*
              * This method refreshes the dataGridView display according to the state of the combobox
              * it also includes some behaviors that disable broken behavior, like having blank name folders
@@ -635,7 +762,16 @@ namespace NotesApp
             {
                 RefreshDataGridNotesFolderList();
                 RefreshFolders();
+
+                e.SuppressKeyPress = true;
+                e.Handled = true;
+
+                if (folderComboBox.Focused)
+                {
+                    this.Focus();
+                }
             }
+            
         }
 
         private void folderComboBox_Leave(object sender, EventArgs e)
@@ -644,9 +780,187 @@ namespace NotesApp
             RefreshFolders();
         }
 
-        // --------------------OPTIONS FIELDS--------------------
+        private void noteTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Control)
+            {
+                if (e.KeyCode == Keys.S)
+                {
+                    saveNote();
+                }
+                if (e.KeyCode == Keys.C && !string.IsNullOrEmpty(noteTextBox.SelectedText))
+                {
+                    Clipboard.SetText(noteTextBox.SelectedText);
+                }
+                if (e.KeyCode == Keys.V && Clipboard.ContainsText())
+                {
+                    noteTextBox.SelectedText = Clipboard.GetText();
+                }
+                e.SuppressKeyPress = true;
+                e.Handled = true;
+            }
+        }
 
+        // END SEARCH FUNCTIONS
+
+        // BEGIN DATAGRIDVIEW FUNCTIONS
+
+        private void cell_DoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            try
+            {
+                // check if datagridview's content is there
+                if (dataGridNotes.Rows.Count <= 0 || dataGridNotes.CurrentCell == null) throw new Exception("invalid cell selection!");
+
+                // check if cell doesn't exist (idfk how this would happen)
+                int index = dataGridNotes.CurrentCell.RowIndex;
+                if (index <= -1) throw new Exception("cell is null!");
+
+                titleTextBox.Text = table.Rows[index].ItemArray[0].ToString();
+                noteTextBox.Text = table.Rows[index].ItemArray[1].ToString();
+                MessageHandler.StatusMessage(statusLabel, $"Loaded note '{titleTextBox.Text}'.");
+
+                folderComboBox.Text = dataGridNotes.CurrentRow.Cells[4].Value.ToString();
+            }
+            catch (Exception exception)
+            {
+                MessageHandler.StatusMessage(statusLabel, "Couldn't open: " + exception.Message);
+            }
+            finally
+            {
+                unfocusCurrentCell();
+            }
+        }
+
+        // END DATAGRIDVIEW FUNCTIONS
+
+        // BEGIN SETTINGS FUNCTIONS
+
+        // warning prompt settings
+        private void setDeleteWithoutPrompt(bool value)
+        {
+            settingDeleteWithoutPromptCheckBox.Checked = value;
+            settingDeleteWithoutPrompt = value;
+        }
+
+        private void settingDeleteWithoutPromptCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            setDeleteWithoutPrompt(settingDeleteWithoutPromptCheckBox.Checked);
+        }
+
+        private void setClearSaveWithoutPrompt(bool value)
+        {
+            settingClearSaveWithoutPromptCheckBox.Checked = value;
+            settingClearSaveWithoutPrompt = value;
+        }
+
+        private void settingClearSaveWithoutPromptCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            setClearSaveWithoutPrompt(settingClearSaveWithoutPromptCheckBox.Checked);
+        }
+
+        // color settings
+
+
+        // MAKE THIS CODE BETTER LATER, IM TIRED AND SLEEPY :(
+        private void colorTrackBar_Scroll(object sender, EventArgs e)
+        {
+            updateColorLabels();
+            updateColors();
+        }
+
+        private void updateColorLabels()
+        {
+            colorRLabel.Text = colorRTrackBar.Value.ToString();
+            colorGLabel.Text = colorGTrackBar.Value.ToString();
+            colorBLabel.Text = colorBTrackBar.Value.ToString();
+        }
+
+        private void updateColors()
+        {
+            switch (colorEditStatus)
+            {
+                case ColorEditStatus.Background:
+                    backgroundColor = Color.FromArgb(colorRTrackBar.Value, colorGTrackBar.Value, colorBTrackBar.Value);
+                    this.BackColor = backgroundColor;
+                    break;
+                case ColorEditStatus.TitleBar:
+                    titleBarColor = Color.FromArgb(colorRTrackBar.Value, colorGTrackBar.Value, colorBTrackBar.Value);
+                    foreach (Control control in titleControls)
+                    {
+                        control.BackColor = titleBarColor;
+                    }
+                    break;
+                case ColorEditStatus.Button:
+                    buttonColor = Color.FromArgb(colorRTrackBar.Value, colorGTrackBar.Value, colorBTrackBar.Value);
+                    foreach (Control control in buttons)
+                    {
+                        control.BackColor = buttonColor;
+                    }
+                    break;
+                case ColorEditStatus.Highlight:
+                    highlightColor = Color.FromArgb(colorRTrackBar.Value, colorGTrackBar.Value, colorBTrackBar.Value);
+                    dataGridNotes.DefaultCellStyle.SelectionBackColor = highlightColor;
+                    break;
+                case ColorEditStatus.Text:
+                    textColor = Color.FromArgb(colorRTrackBar.Value, colorGTrackBar.Value, colorBTrackBar.Value);
+                    dataGridNotes.DefaultCellStyle.ForeColor = textColor;
+                    dataGridNotes.DefaultCellStyle.SelectionForeColor = Color.FromArgb(255 - textColor.R, 255 - textColor.G, 255 - textColor.B);
+                    foreach (Control control in controlsWithText)
+                    {
+                        control.ForeColor = textColor;
+                    }
+                    break;
+                
+                case ColorEditStatus.TextBox:
+                    textBoxColor = Color.FromArgb(colorRTrackBar.Value, colorGTrackBar.Value, colorBTrackBar.Value);
+                    dataGridNotes.BackgroundColor = textBoxColor;
+                    dataGridNotes.DefaultCellStyle.BackColor = textBoxColor;
+                    foreach (Control control in textBoxes)
+                    {
+                        control.BackColor = textBoxColor;
+                    }
+                    break;
+            }
+        }
+
+        private void updateColorTrackBarValues()
+        {
+            Dictionary<ColorEditStatus, Color> colorMap = new Dictionary<ColorEditStatus, Color>
+            {
+                { ColorEditStatus.Background, backgroundColor },
+                { ColorEditStatus.Button, buttonColor },
+                { ColorEditStatus.Highlight, highlightColor },
+                { ColorEditStatus.Text, textColor },
+                { ColorEditStatus.TextBox, textBoxColor },
+                { ColorEditStatus.TitleBar, titleBarColor }
+            };
+
+            if (colorMap.TryGetValue(colorEditStatus, out Color color))
+            {
+                colorRTrackBar.Value = color.R;
+                colorGTrackBar.Value = color.G;
+                colorBTrackBar.Value = color.B;
+            }
+            updateColorLabels();
+        }
+
+        private void colorComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                colorEditStatus = (ColorEditStatus)Enum.Parse(typeof(ColorEditStatus), colorComboBox.Text);
+                updateColorTrackBarValues();
+            }
+            catch (Exception exception)
+            {
+                MessageHandler.DebugWrite(exception.Message);
+            }
+            
+        }
     }
+
+
 
     [Serializable]
     public class RawRowsPacket

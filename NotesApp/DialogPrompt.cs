@@ -11,8 +11,12 @@ using System.Runtime.InteropServices;
 
 namespace NotesApp
 {
+
+    
     public partial class DialogPrompt : Form
     {
+        public bool isDontAskAgainChecked;
+
         private const int MW_NCLBUTTONDOWN = 0x00A1;
         private const int HT_CAPTION = 0x02;
         [DllImportAttribute("user32.dll")]
@@ -23,6 +27,10 @@ namespace NotesApp
         public DialogPrompt()
         {
             InitializeComponent();
+
+            dontAskCheckBox.Checked = false;
+            isDontAskAgainChecked = dontAskCheckBox.Checked;
+            
 
             this.StartPosition = FormStartPosition.CenterParent;
 
@@ -36,18 +44,21 @@ namespace NotesApp
         private void yesButton_Click(object sender, EventArgs e)
         {
             this.DialogResult = DialogResult.Yes;
+            if (dontAskCheckBox.Checked) isDontAskAgainChecked = true;
             this.Close();
         }
 
         private void noButton_Click(object sender, EventArgs e)
         {
             this.DialogResult = DialogResult.No;
+            if (dontAskCheckBox.Checked) isDontAskAgainChecked = true;
             this.Close();
         }
 
         private void buttonExit_Click(object sender, EventArgs e)
         {
             this.DialogResult = DialogResult.Cancel;
+            if (dontAskCheckBox.Checked) isDontAskAgainChecked = true;
             this.Close();
         }
 

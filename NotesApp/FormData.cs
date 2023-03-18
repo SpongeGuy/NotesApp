@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Data;
 using System.Windows.Forms;
 using NotesApp;
+using System.Drawing;
 
 namespace NotesApp
 {
@@ -20,8 +21,21 @@ namespace NotesApp
         public List<string> folders;
         public RawRowsPacket packet;
 
+        // window height
         public int windowHeight;
         public NotesApp.WindowSizeStatuses windowSizeStatus;
+
+        // warning prompt
+        public bool settingDeleteWithoutPrompt;
+        public bool settingClearSaveWithoutPrompt;
+
+        // colors
+        public Color backgroundColor;
+        public Color titleBarColor;
+        public Color buttonColor;
+        public Color textColor;
+        public Color highlightColor;
+        public Color textBoxColor;
 
         public FormData(NotesApp app)
         {
@@ -33,9 +47,22 @@ namespace NotesApp
             modifiedDates = packet.modifiedDates;
             folders = packet.folders;
 
+            // window height
             windowHeight = app.windowHeight;
             windowSizeStatus = app.windowSizeStatus;
-            
+
+            // warning prompt
+            settingDeleteWithoutPrompt = app.settingDeleteWithoutPrompt;
+            settingClearSaveWithoutPrompt = app.settingClearSaveWithoutPrompt;
+
+            // colors
+            backgroundColor = app.backgroundColor;
+            titleBarColor = app.titleBarColor;
+            buttonColor = app.buttonColor;
+            textColor = app.textColor;
+            highlightColor = app.highlightColor;
+            textBoxColor = app.textBoxColor;
+
             
         }
     }
