@@ -15,3 +15,4 @@ You can customize the colors of the application here and toggle some settings.
 This is an old project, and I am aware of some bugs/features not yet implemented.
 - content inside the window is weird on resolutions not equal to 1920x1080
 - flickering when customizing colors
+- `read` button does jack shit
