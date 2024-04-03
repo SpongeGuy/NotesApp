@@ -101,6 +101,8 @@ namespace NotesApp
 
             populateControlLists();
 
+
+
             // this controls the resize button's behaviors when holding control (accessing options menu)
             hoveringResizeButtonTimer = new System.Windows.Forms.Timer();
             hoveringResizeButtonTimer.Interval = 100;
@@ -320,6 +322,7 @@ namespace NotesApp
             }
         }
 
+        // this is for the fucking BULLSHIT SERIALIZATION LOADING PACKET FUCKINGSHIT
         public RawRowsPacket GetRawRows()
         {
             
