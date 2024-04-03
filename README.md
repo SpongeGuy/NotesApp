@@ -11,7 +11,7 @@ The drop-down list acts as a folder system. Change the text in the drop-down lis
 ## SECRET SETTINGS
 Hold `ctrl` while clicking on the maximize button. This will open up a settings panel.
 You can customize the colors of the application here and toggle some settings.
-### BUGS
+## BUGS
 This is an old project, and I am aware of some bugs/features not yet implemented.
 - content inside the window is weird on resolutions not equal to 1920x1080
 - flickering when customizing colors
